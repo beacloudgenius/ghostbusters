@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  ghost:
+    image: ghost:5-alpine
+    restart: always
+    ports:
+      - "8093:2368"
+    environment:
+      database__client: "mysql"
+      database__connection__host: "mysql"
+      database__connection__port: "3306"
+      database__connection__user: "root"
+      database__connection__password: "supersecret"
+      database__connection__database: "ghost"
+      NODE_ENV: production
+    volumes:
+      - $PWD/ghost:/var/lib/ghost/content
+    networks:
+      - ghostnetwork
+  mysql:
+    image: mysql:8.3
+    environment:
+      MYSQL_ROOT_PASSWORD: "supersecret"
+      MYSQL_DATABASE: "ghost"
+    volumes:
+      - $PWD/mysql:/var/lib/mysql
+    networks:
+      - ghostnetwork
+
+networks:
+  ghostnetwork:
+    external: true

@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ghost
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      role: ghost
+  template:
+    metadata:
+      labels:
+        role: ghost
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: ghost
+          image: ghost:5-alpine
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 2368
+              protocol: TCP
+          env:
+            - name: database__client
+              value: mysql
+            - name: database__connection__host
+              value: mysql
+            - name: database__connection__port
+              value: "3306"
+            - name: database__connection__user
+              value: root
+            - name: database__connection__password
+              value: supersecret
+            - name: database__connection__database
+              value: ghost
+            - name: NODE_ENV
+              value: production
+          volumeMounts:
+            # name must match the volume name below
+            - name: ghostfiles
+              mountPath: /var/lib/ghost/content
+      volumes:
+        - name: ghostfiles
+          persistentVolumeClaim:
+            claimName: ghostfiles

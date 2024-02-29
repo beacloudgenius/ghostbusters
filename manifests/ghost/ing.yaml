@@ -1,0 +1,24 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ghost
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: ghost.boeing.internal.cloudgenius.app
+      http:
+        paths:
+          - backend:
+              service:
+                name: ghost
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - "ghost.boeing.internal.cloudgenius.app"
+      secretName: ghost-tls
